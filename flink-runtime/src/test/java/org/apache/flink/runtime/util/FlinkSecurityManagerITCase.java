@@ -26,11 +26,16 @@ import org.apache.flink.util.OperatingSystem;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledForJreRange;
+import org.junit.jupiter.api.condition.JRE;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assumptions.assumeThat;
 
 /** Integration tests for the {@link FlinkSecurityManager}. */
+@EnabledForJreRange(
+        max = JRE.JAVA_23,
+        disabledReason = "The Security Manager was permanently disabled in Java 24.")
 class FlinkSecurityManagerITCase {
 
     @BeforeEach

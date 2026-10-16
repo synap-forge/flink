@@ -70,6 +70,8 @@ import org.apache.flink.util.concurrent.Executors;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledForJreRange;
+import org.junit.jupiter.api.condition.JRE;
 
 import java.util.Collections;
 
@@ -83,6 +85,9 @@ import static org.mockito.Mockito.mock;
  * exit is enabled inside relevant methods that can call user-defined functions in {@code
  * StreamTask}.
  */
+@EnabledForJreRange(
+        max = JRE.JAVA_23,
+        disabledReason = "The Security Manager was permanently disabled in Java 24.")
 class StreamTaskSystemExitTest {
     private static final int TEST_EXIT_CODE = 123;
     private SecurityManager originalSecurityManager;

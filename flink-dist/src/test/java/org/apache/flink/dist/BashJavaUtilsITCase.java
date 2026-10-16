@@ -31,10 +31,14 @@ import org.apache.flink.shaded.guava33.com.google.common.collect.Sets;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -59,6 +63,43 @@ class BashJavaUtilsITCase extends JavaBashTestBase {
             "src/test/bin/runExtractLoggingOutputs.sh";
 
     @TempDir private Path tmpDir;
+
+    @ParameterizedTest
+    @CsvSource({"17, false", "18, true", "21, true", "23, true", "24, false", "25, false"})
+    void testSecurityManagerJavaOption(int javaVersion, boolean expected) throws Exception {
+        final Path javaBin = Files.createDirectories(tmpDir.resolve("java/bin"));
+        final Path javaExecutable = javaBin.resolve("java");
+        Files.writeString(
+                javaExecutable,
+                String.join(
+                        "\n",
+                        "#!/usr/bin/env bash",
+                        "if [[ \"$1\" == \"-XshowSettings:properties\" ]]; then",
+                        "  echo \"java.specification.version = $FLINK_TEST_JAVA_VERSION\"",
+                        "else",
+                        "  exec \"$FLINK_TEST_REAL_JAVA\" \"$@\"",
+                        "fi",
+                        ""),
+                StandardCharsets.UTF_8);
+        assertThat(javaExecutable.toFile().setExecutable(true)).isTrue();
+
+        final String[] command = {
+            "bash",
+            "-c",
+            "export JAVA_HOME=\"$1\" FLINK_TEST_REAL_JAVA=\"$4\" FLINK_TEST_JAVA_VERSION=\"$5\"; "
+                    + "FLINK_HOME=\"$2\"; _FLINK_HOME_DETERMINED=1; "
+                    + "unset FLINK_ENV_JAVA_OPTS; source \"$3\"; "
+                    + "echo \"$FLINK_ENV_JAVA_OPTS\"",
+            "config-java-options-test",
+            javaBin.getParent().toAbsolutePath().toString(),
+            new File("../build-target").getCanonicalPath(),
+            new File("src/main/flink-bin/bin/config.sh").getCanonicalPath(),
+            new File(System.getProperty("java.home"), "bin/java").getAbsolutePath(),
+            String.valueOf(javaVersion)
+        };
+        assertThat(executeScript(command).contains("-Djava.security.manager=allow"))
+                .isEqualTo(expected);
+    }
 
     @Test
     void testGetTmResourceParamsConfigs() throws Exception {

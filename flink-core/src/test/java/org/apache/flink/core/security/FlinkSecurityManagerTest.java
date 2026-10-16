@@ -28,6 +28,8 @@ import org.apache.flink.testutils.executor.TestExecutorExtension;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledForJreRange;
+import org.junit.jupiter.api.condition.JRE;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
 import java.security.Permission;
@@ -39,6 +41,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /** Tests for {@code FlinkUserSecurityManager}. */
+@EnabledForJreRange(
+        max = JRE.JAVA_23,
+        disabledReason = "The Security Manager was permanently disabled in Java 24.")
 class FlinkSecurityManagerTest {
 
     @RegisterExtension

@@ -43,7 +43,7 @@ The following Flink features have not been tested with Java 11:
 
 ## Java 17
 
-We use Java 17 by default in Flink 2.0.0 and is the recommended Java version to run Flink on.
+Java 17 became the default in Flink 2.0.0.
 This is the default version for docker images.
 
 Support for Java Records was added in Flink 1.19 ([FLINK-32380](https://issues.apache.org/jira/browse/FLINK-32380)).
@@ -67,7 +67,21 @@ These Flink features have not been tested with Java 21:
 * Hive connector
 * Hbase 1.x connector
 
-### JDK modularization
+## Java 25
+
+Java 25 is the default JDK and bytecode target for builds from this source tree.
+Use `./mvnw clean package -DskipTests -Djdk25 -Pjava25-target` with `JAVA_HOME` pointing to a Java 25 JDK.
+Builds targeting Java 11, 17, or 21 remain available through the corresponding `java<version>-target` profile.
+Java 25 artifacts require Java 25 or later to run.
+
+The build retains Java 11 source syntax, except for the Java 17-specific test module.
+Formatting checks run separately with Java 17 because the existing formatter is incompatible with Java 25.
+
+The Security Manager was permanently disabled in Java 24.
+The `cluster.intercept-user-system-exit` and `cluster.processes.halt-on-fatal-error` options must remain at their default values on Java 25.
+Security Manager tests continue to run on earlier supported JDKs.
+
+## JDK modularization
 
 Starting with Java 16 Java applications have to fully cooperate with the JDK modularization, also known as [Project Jigsaw](https://openjdk.org/projects/jigsaw/).
 This means that access to JDK classes/internal must be explicitly allowed by the application when it is started, on a per-module basis, in the form of --add-opens/--add-exports JVM arguments.
@@ -79,7 +93,7 @@ These should be configured via the [env.java.opts.all]({{< ref "docs/deployment/
 In the default configuration in the Flink distribution this option is configured such that Flink itself works on Java 17.  
 The list of configured arguments must not be shortened, but only extended.
 
-### Known issues
+## Known issues
 
 * Mandatory Kryo dependency upgrade, [FLIP-371](https://cwiki.apache.org/confluence/display/FLINK/FLIP-317%3A+Upgrade+Kryo+from+2.24.0+to+5.5.0).
 * SIGSEGV in C2 Compiler thread: Early Java 17 builds are affected by a bug where the JVM can fail abruptly. Update your Java 17 installation to resolve the issue. See [JDK-8277529](https://bugs.openjdk.org/browse/JDK-8277529) for details.

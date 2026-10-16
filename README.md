@@ -104,7 +104,7 @@ Prerequisites for building Flink:
 * Unix-like environment (we use Linux, Mac OS X, Cygwin, WSL)
 * Git
 * Maven (we require version 3.8.6)
-* Java (version 11, 17, or 21)
+* Java (version 25 by default; versions 11, 17, and 21 can be selected with build profiles)
 
 ### Basic Build Instructions
 
@@ -123,7 +123,7 @@ Then, choose one of the following commands based on your preferred Java version:
 ./mvnw clean package -DskipTests -Djdk11 -Pjava11-target
 ```
 
-**For Java 17 (Default)**
+**For Java 17**
 
 ```
 ./mvnw clean package -DskipTests -Djdk17 -Pjava17-target
@@ -135,6 +135,12 @@ Then, choose one of the following commands based on your preferred Java version:
 ./mvnw clean package -DskipTests -Djdk21 -Pjava21-target
 ```
 
+**For Java 25 (Default)**
+
+```
+./mvnw clean package -DskipTests -Djdk25 -Pjava25-target
+```
+
 The build process will take approximately 10 minutes to complete.
 Flink will be installed in `build-target`.
 
@@ -144,6 +150,8 @@ Flink will be installed in `build-target`.
 * The build command uses Maven wrapper (mvnw) which ensures the correct Maven version is used
 * The -DskipTests flag skips running tests to speed up the build process
 * Each Java version requires its corresponding profile (-Pjava<version>-target) and JDK flag (-Djdk<version>)
+* Java 25 builds retain Java 11 source syntax, except in the `flink-tests-java17` module
+* Run Spotless with Java 17 and `-Pjava17-target`; the Java 25 profile skips the existing formatter because it is incompatible with Java 25
 
 ## Developing Flink
 

@@ -39,6 +39,8 @@ import org.apache.flink.runtime.testutils.SystemExitTrackingSecurityManager;
 import org.apache.flink.util.function.FunctionUtils;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledForJreRange;
+import org.junit.jupiter.api.condition.JRE;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -723,6 +725,9 @@ abstract class AbstractFineGrainedSlotManagerITCase extends FineGrainedSlotManag
      * breakdown.
      */
     @Test
+    @EnabledForJreRange(
+            max = JRE.JAVA_23,
+            disabledReason = "The Security Manager was permanently disabled in Java 24.")
     void testAllocationUpdatesIgnoredIfTaskExecutorUnregistered() throws Exception {
         final CompletableFuture<Acknowledge> slotRequestFuture = new CompletableFuture<>();
         final CompletableFuture<Void> slotRequestCallFuture = new CompletableFuture<>();
@@ -783,6 +788,9 @@ abstract class AbstractFineGrainedSlotManagerITCase extends FineGrainedSlotManag
     }
 
     @Test
+    @EnabledForJreRange(
+            max = JRE.JAVA_23,
+            disabledReason = "The Security Manager was permanently disabled in Java 24.")
     void testAllocationUpdatesIgnoredIfSlotMarkedAsAllocatedAfterSlotReport() throws Exception {
         final CompletableFuture<AllocationID> allocationIdFuture = new CompletableFuture<>();
         final TestingTaskExecutorGateway taskExecutorGateway =

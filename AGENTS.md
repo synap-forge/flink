@@ -23,18 +23,33 @@ This file provides guidance for AI coding agents working with the Apache Flink c
 
 ## Prerequisites
 
-- Java 11, 17 (default), or 21. Java 11 syntax must be used in all modules. Java 17 syntax (records, sealed classes, pattern matching) is only permitted in the `flink-tests-java17` module.
+- Java 25 (default), or 11, 17, or 21 with the corresponding build profile. Java 11 syntax must be used in all modules. Java 17 syntax (records, sealed classes, pattern matching) is only permitted in the `flink-tests-java17` module.
 - Maven 3.8.6 (Maven wrapper `./mvnw` included; prefer it)
 - Git
 - Unix-like environment (Linux, macOS, WSL, Cygwin)
+
+## graphify
+
+This project has a knowledge graph at `graphify-out/` with god nodes, community structure, and cross-file relationships.
+
+When the user types `/graphify`, use the installed graphify skill or instructions before doing anything else.
+
+Rules:
+
+- For codebase questions, first run `graphify query "<question>"` when `graphify-out/graph.json` exists. Use `graphify path "<A>" "<B>"` for relationships and `graphify explain "<concept>"` for focused concepts. These return a scoped subgraph, usually much smaller than `GRAPH_REPORT.md` or raw grep output.
+- Dirty `graphify-out/` files are expected after hooks or incremental updates; dirty graph files are not a reason to skip graphify. Only skip graphify if the task is about stale or incorrect graph output, or the user explicitly says not to use it.
+- If `graphify-out/wiki/index.md` exists, use it for broad navigation instead of raw source browsing.
+- Read `graphify-out/GRAPH_REPORT.md` only for broad architecture review or when query/path/explain do not surface enough context.
+- After modifying code, run `graphify update .` to keep the graph current (AST-only, no API cost).
 
 ## Commands
 
 ### Build
 
 - Fast dev build: `./mvnw clean install -DskipTests -Dfast -Pskip-webui-build -T1C`
-- Full build (Java 17 default): `./mvnw clean package -DskipTests -Djdk17 -Pjava17-target`
+- Full build (Java 25 default): `./mvnw clean package -DskipTests -Djdk25 -Pjava25-target`
 - Java 11: `./mvnw clean package -DskipTests -Djdk11 -Pjava11-target`
+- Java 17: `./mvnw clean package -DskipTests -Djdk17 -Pjava17-target`
 - Java 21: `./mvnw clean package -DskipTests -Djdk21 -Pjava21-target`
 - Full build with tests: `./mvnw clean verify`
 - Single module: `./mvnw clean package -DskipTests -pl flink-core-api`
@@ -47,8 +62,8 @@ This file provides guidance for AI coding agents working with the Apache Flink c
 
 ### Code Quality
 
-- Format code (Java + Scala): `./mvnw spotless:apply`
-- Check formatting: `./mvnw spotless:check`
+- Format code (Java + Scala, using Java 17): `./mvnw -Pjava17-target spotless:apply`
+- Check formatting (using Java 17): `./mvnw -Pjava17-target spotless:check`
 - Checkstyle: `./mvnw checkstyle:check -T1C`
 - Checkstyle config: `tools/maven/checkstyle.xml`
 
@@ -253,7 +268,7 @@ This section maps common types of Flink changes to the modules they touch and th
 
 ## Coding Standards
 
-- **Format Java files with Spotless immediately after editing:** `./mvnw spotless:apply`. Uses google-java-format with AOSP style.
+- **Format Java files with Spotless immediately after editing, using Java 17:** `./mvnw -Pjava17-target spotless:apply`. Uses google-java-format with AOSP style; the Java 25 profile skips this formatter because it is incompatible with Java 25.
 - **Scala formatting:** Spotless + scalafmt (config at `.scalafmt.conf`, maxColumn 100).
 - **Checkstyle:** `tools/maven/checkstyle.xml` (version defined in root `pom.xml` as `checkstyle.version`). Some modules (flink-core, flink-optimizer, flink-runtime) are not covered by checkstyle enforcement, but conventions should still be followed.
 - **No new Scala code.** All Flink Scala APIs are deprecated per FLIP-265. Write all new code in Java.

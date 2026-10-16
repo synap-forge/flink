@@ -18,10 +18,10 @@
 ################################################################################
 set -e
 
-# override env to use Java 17 to for build instead default Java 8
+# Use the default build JDK from the CI image.
 # path to JDK is taken from https://github.com/apache/flink-connector-shared-utils/blob/ci_utils/docker/base/Dockerfile#L37-L40
-export JAVA_HOME=$JAVA_HOME_17_X64
-export PATH=$JAVA_HOME_17_X64/bin:$PATH
+export JAVA_HOME=$JAVA_HOME_25_X64
+export PATH=$JAVA_HOME_25_X64/bin:$PATH
 
 mvn --version
 java -version
@@ -62,12 +62,12 @@ ErrorDocument 404 /flink/flink-docs-${BRANCH}/404.html
 EOF
 
 # build Flink; required for Javadoc step
-mvn clean install -B -DskipTests -Dfast -Dskip.npm -Pskip-webui-build
+mvn clean install -B -DskipTests -Dfast -Dskip.npm -Djdk25 -Pskip-webui-build,java25-target
 
 # build java/scala docs
 mkdir -p docs/target/api
 mvn javadoc:aggregate -B \
-    -Pskip-webui-build \
+    -Djdk25 -Pskip-webui-build,java25-target \
     -Dmaven.javadoc.failOnError=true \
     -Dcheckstyle.skip=true \
     -Dspotless.check.skip=true \

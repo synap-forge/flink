@@ -132,7 +132,7 @@ under the License.
 		<flink.shaded.jsonpath.version>2.10.0</flink.shaded.jsonpath.version>
 		<flink.markBundledAsOptional>true</flink.markBundledAsOptional>
 		<source.java.version>11</source.java.version>
-		<target.java.version>17</target.java.version>
+		<target.java.version>25</target.java.version>
 		<slf4j.version>1.7.36</slf4j.version>
 		<log4j.version>2.25.3</log4j.version>
 		<!-- Overwrite default values from parent pom.
@@ -141,7 +141,7 @@ under the License.
 		<maven.compiler.source>${source.java.version}</maven.compiler.source>
 		<maven.compiler.target>${target.java.version}</maven.compiler.target>
 		<scala.macros.version>2.1.1</scala.macros.version>
-		<scala.version>2.12.20</scala.version>
+		<scala.version>2.12.21</scala.version>
 		<scala.binary.version>2.12</scala.binary.version>
 		<!-- keep FlinkTestcontainersConfigurator.configureZookeeperContainer in sync -->
 		<zookeeper.version>3.7.2</zookeeper.version>
@@ -1141,6 +1141,10 @@ under the License.
 		<profile>
 			<id>java17-target</id>
 
+			<properties>
+				<target.java.version>17</target.java.version>
+			</properties>
+
 			<modules>
 				<module>flink-tests-java17</module>
 			</modules>
@@ -1152,7 +1156,7 @@ under the License.
 						<artifactId>maven-compiler-plugin</artifactId>
 						<configuration>
 							<!-- Use source here which is 11 to fail fast in case of jdk12+ syntax use
-							since default is 17 and CI compile task uses this profile -->
+									regardless of the target Java version -->
 							<source>${source.java.version}</source>
 							<target>17</target>
 							<compilerArgs combine.children="append">
@@ -1189,6 +1193,10 @@ under the License.
 
 		<profile>
 			<id>java21-target</id>
+
+			<properties>
+				<target.java.version>21</target.java.version>
+			</properties>
 
 			<modules>
 				<module>flink-tests-java17</module>
@@ -1250,13 +1258,22 @@ under the License.
 
 		<profile>
 			<id>java25-target</id>
+
+			<properties>
+				<target.java.version>25</target.java.version>
+			</properties>
+
+			<modules>
+				<module>flink-tests-java17</module>
+			</modules>
+
 			<build>
 				<plugins>
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-compiler-plugin</artifactId>
 						<configuration>
-							<source>25</source>
+							<source>${source.java.version}</source>
 							<target>25</target>
 							<compilerArgs combine.children="append">
 								<arg>--add-exports=java.management/sun.management=ALL-UNNAMED</arg>
